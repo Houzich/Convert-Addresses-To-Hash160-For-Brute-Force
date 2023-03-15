@@ -70,7 +70,7 @@ namespace tools {
 
 			if (
 				((type_address == 0) && ((addr_str.size() == 33) || (addr_str.size() == 34)) && (addr_str[0] == '1')) ||
-				((type_address == 1) && (addr_str.size() == 42) && (addr_str[0] == 'b'))
+				((type_address == 1) && (addr_str.size() == 42) && (addr_str[0] == 'b') && (addr_str[3] == 'q'))
 				)
 			{
 #ifdef	USE_REVERSE_32
