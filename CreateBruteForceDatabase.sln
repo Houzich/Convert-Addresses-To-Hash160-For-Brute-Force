@@ -8,7 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "exe", "exe", "{35AB9293-AFB9-45D0-874B-0866E8DFBC8C}"
 	ProjectSection(SolutionItems) = preProject
 		exe\config.cfg = exe\config.cfg
-		exe\CreateBruteForceDatabase.exe = exe\CreateBruteForceDatabase.exe
+		exe\CreateBruteForceDatabaseV11.exe = exe\CreateBruteForceDatabaseV11.exe
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "image", "image", "{08E08809-7DDE-4CAD-979E-1902C8F95F38}"

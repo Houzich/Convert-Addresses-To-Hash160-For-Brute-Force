@@ -1,4 +1,13 @@
-﻿#include "main.h"
+﻿/**
+  ******************************************************************************
+  * @author		Anton Houzich
+  * @version	V1.1.0
+  * @date		1-April-2023
+  * @mail		houzich_anton@mail.ru
+  * discussion  https://t.me/BRUTE_FORCE_CRYPTO_WALLET
+  ******************************************************************************
+  */
+#include "main.h"
 #include <sstream>
 #include <iomanip>
 #include <iostream>
@@ -14,9 +23,6 @@
 #include "base58.h"
 #include "segwit_addr.h"
 #include "Config.hpp"
-
-#define GENERATE_BIP84
-
 
 namespace tools {
 
@@ -70,20 +76,32 @@ namespace tools {
 
 			if (
 				((type_address == 0) && ((addr_str.size() == 33) || (addr_str.size() == 34)) && (addr_str[0] == '1')) ||
-				((type_address == 1) && (addr_str.size() == 42) && (addr_str[0] == 'b') && (addr_str[3] == 'q'))
+				((type_address == 1) && (addr_str.size() == 42) && (addr_str[0] == 'b') && (addr_str[3] == 'q')) ||
+				((type_address == 2) && (addr_str.size() == 42) && (addr_str[0] == '0') && ((addr_str[1] == 'x')||(addr_str[1] == 'X'))) ||
+				((type_address == 2) && (addr_str.size() == 40))
 				)
 			{
 #ifdef	USE_REVERSE_32
 				uint8_t hash160[20];
 				if (type_address == 0)
 					ret = decodeAddressBase58(addr_str, hash160);
-				else
+				else if (type_address == 1)
 					ret = decodeAddressBase32(addr_str, hash160);
+				else (type_address == 2)
 #else
 				if (type_address == 0)
+				{
 					ret = decodeAddressBase58(addr_str, hash160hex);
-				else
+				}
+				else if (type_address == 1)
+				{
 					ret = decodeAddressBase32(addr_str, hash160hex);
+				}
+				else if (type_address == 2)
+				{
+					if (addr_str.size() == 42) hash160hex = addr_str.substr(2, 42);
+					else hash160hex = addr_str;
+				}
 #endif //USE_REVERSE
 
 				if (ret) {
@@ -249,28 +267,31 @@ namespace tools {
 		std::string filename = "";
 		std::cout << "file path: " << config.folder_with_files_for_decode << std::endl;
 		std::cout << "Please, enter file name: ";
-		std::cin >> filename;
-		//std::getline(std::cin, filename);
-		std::cout << "Please, enter addresses type: " << std::endl;
+		//std::cin >> filename;
+		std::cin.clear();
+		std::getline(std::cin, filename);
 		int type_address = -1;
 		while (type_address == -1)
 		{
-			std::cout << "[0] - Legacy, [1] - SegWit" << std::endl;
+			std::cout << "[0] - Bitcoin Legacy, [1] - Bitcoin Native SegWit (Bech32), [2] - Ethereum" << std::endl;
+			std::cout << "Please, enter addresses type: ";
 			std::cin >> type_address;
-			if (type_address != 0 && type_address != 1)
+			if (type_address != 0 && type_address != 1 && type_address != 2)
 			{
 				type_address = -1;
-				std::cout << "Invalid addresses type! Please type 0 or 1" << std::endl;
+				std::cout << "Invalid addresses type! Please type 0..2" << std::endl;
 			}
 		}
 
 		std::string filepath = config.folder_with_files_for_decode + "\\" + filename;
 		std::string folger_for_result;
 		if (type_address == 0) folger_for_result = config.folder_for_database_legacy + "\\";
-		else folger_for_result = config.folder_for_database_segwit + "\\";
+		else if (type_address == 1) folger_for_result = config.folder_for_database_segwit + "\\";
+		else if (type_address == 2) folger_for_result = config.folder_for_database_ethereum + "\\";
 		std::cout << "--------------------------------------------" << std::endl;
-		if (type_address == 0) std::cout << "decode legacy addresses" << std::endl;
-		else std::cout << "decode segwit addresses" << std::endl;
+		if (type_address == 0) std::cout << "decode bitcoin legacy addresses" << std::endl;
+		else if(type_address == 1) std::cout << "decode bitcoin native segwit addresses" << std::endl;
+		else if (type_address == 2) std::cout << "decode ethereum addresses" << std::endl;
 		std::cout << "file: " << filepath << std::endl;
 		std::cout << "folder for save result: " << folger_for_result << std::endl;
 		std::cout << "--------------------------------------------" << std::endl;

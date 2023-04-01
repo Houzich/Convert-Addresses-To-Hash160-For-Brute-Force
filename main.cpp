@@ -1,5 +1,12 @@
-// main.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+/**
+  ******************************************************************************
+  * @author		Anton Houzich
+  * @version	V1.1.0
+  * @date		1-April-2023
+  * @mail		houzich_anton@mail.ru
+  * discussion  https://t.me/BRUTE_FORCE_CRYPTO_WALLET
+  ******************************************************************************
+  */
 #include "stdafx.h"
 #include <main.h>
 #include <iostream>
