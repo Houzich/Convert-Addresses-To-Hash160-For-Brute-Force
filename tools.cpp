@@ -268,7 +268,7 @@ namespace tools {
 		std::cout << "file path: " << config.folder_with_files_for_decode << std::endl;
 		std::cout << "Please, enter file name: ";
 		//std::cin >> filename;
-		std::cin.clear();
+		//std::cin.clear();
 		std::getline(std::cin, filename);
 		int type_address = -1;
 		while (type_address == -1)
@@ -281,6 +281,7 @@ namespace tools {
 				type_address = -1;
 				std::cout << "Invalid addresses type! Please type 0..2" << std::endl;
 			}
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		}
 
 		std::string filepath = config.folder_with_files_for_decode + "\\" + filename;
