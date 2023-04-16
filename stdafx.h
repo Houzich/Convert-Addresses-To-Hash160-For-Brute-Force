@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
   * @author		Anton Houzich
-  * @version	V1.1.0
-  * @date		1-April-2023
+  * @version	V1.2.0
+  * @date		16-April-2023
   * @mail		houzich_anton@mail.ru
   * discussion  https://t.me/BRUTE_FORCE_CRYPTO_WALLET
   ******************************************************************************
@@ -13,6 +13,10 @@
 #define SIZE_HASH160_FRAME					(20ULL)
 #define SIZE32_HASH160_FRAME			    (20ULL / 4ULL)
 
+#define ADDRESS_BITCOIN_LEGACY				(0)
+#define ADDRESS_BITCOIN_SEGWIT				(1)
+#define ADDRESS_BITCOIN_NATIVE_SEGWIT		(2)
+#define ADDRESS_ETHEREUM					(3)
 
 //#define USE_REVERSE_32
 

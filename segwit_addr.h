@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
   * @author		Anton Houzich
-  * @version	V1.1.0
-  * @date		1-April-2023
+  * @version	V1.2.0
+  * @date		16-April-2023
   * @mail		houzich_anton@mail.ru
   * discussion  https://t.me/BRUTE_FORCE_CRYPTO_WALLET
   ******************************************************************************
@@ -24,7 +24,7 @@ namespace tools {
      *       prog_len: Number of data bytes in prog.
      *  Returns 1 if successful.
      */
-    int segwit_addr_encode(char* output, const char* hrp, int ver,
+    int native_segwit_addr_encode(char* output, const char* hrp, int ver,
         const uint8_t* prog, size_t prog_len);
 
     /** Encode a Bech32 string
@@ -52,7 +52,7 @@ namespace tools {
      *       addr:     Pointer to the null-terminated address.
      *  Returns 1 if successful.
      */
-    int segwit_addr_decode(
+    int native_segwit_addr_decode(
         int* ver,
         uint8_t* prog,
         size_t* prog_len,

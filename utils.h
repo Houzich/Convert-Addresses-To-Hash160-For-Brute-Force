@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
   * @author		Anton Houzich
-  * @version	V1.1.0
-  * @date		1-April-2023
+  * @version	V1.2.0
+  * @date		16-April-2023
   * @mail		houzich_anton@mail.ru
   * discussion  https://t.me/BRUTE_FORCE_CRYPTO_WALLET
   ******************************************************************************
@@ -29,5 +29,8 @@ namespace tools {
 	int encodeAddressBase32(const uint8_t* hash160, std::string& addr);
 	int decodeAddressBase32(const std::string& addr, std::string& hash160hex);
 	int decodeAddressBase32(const std::string& addr, uint8_t* bytes);
+	int encodeAddressBIP49(const uint8_t* hash160, std::string& addr);
+	int decodeAddressBIP49(const std::string& addr, std::string& hash160hex);
+	int decodeAddressBIP49(const std::string& addr, uint8_t* hash160);
 	void reverseHashUint32(uint32_t* hash_in, uint32_t* hash_out);
 }

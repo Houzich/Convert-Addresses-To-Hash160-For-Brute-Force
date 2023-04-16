@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
   * @author		Anton Houzich
-  * @version	V1.1.0
-  * @date		1-April-2023
+  * @version	V1.2.0
+  * @date		16-April-2023
   * @mail		houzich_anton@mail.ru
   * discussion  https://t.me/BRUTE_FORCE_CRYPTO_WALLET
   ******************************************************************************
@@ -97,7 +97,7 @@ namespace tools {
         return 1;
     }
 
-    int segwit_addr_encode(char* output, const char* hrp, int witver, const uint8_t* witprog, size_t witprog_len) {
+    int native_segwit_addr_encode(char* output, const char* hrp, int witver, const uint8_t* witprog, size_t witprog_len) {
         uint8_t data[65] = { 0 };
         size_t datalen = 0;
         if (witver > 16) return 0;
@@ -209,7 +209,7 @@ namespace tools {
     }
 
 
-    int segwit_addr_decode(int* witver, uint8_t* witdata, size_t* witdata_len, const char* hrp, const char* addr)
+    int native_segwit_addr_decode(int* witver, uint8_t* witdata, size_t* witdata_len, const char* hrp, const char* addr)
     {
         uint8_t data[84];
         char hrp_actual[84];

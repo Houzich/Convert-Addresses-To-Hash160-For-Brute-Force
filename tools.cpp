@@ -1,8 +1,8 @@
 ﻿/**
   ******************************************************************************
   * @author		Anton Houzich
-  * @version	V1.1.0
-  * @date		1-April-2023
+  * @version	V1.2.0
+  * @date		16-April-2023
   * @mail		houzich_anton@mail.ru
   * discussion  https://t.me/BRUTE_FORCE_CRYPTO_WALLET
   ******************************************************************************
@@ -75,29 +75,37 @@ namespace tools {
 
 
 			if (
-				((type_address == 0) && ((addr_str.size() == 33) || (addr_str.size() == 34)) && (addr_str[0] == '1')) ||
-				((type_address == 1) && (addr_str.size() == 42) && (addr_str[0] == 'b') && (addr_str[3] == 'q')) ||
-				((type_address == 2) && (addr_str.size() == 42) && (addr_str[0] == '0') && ((addr_str[1] == 'x')||(addr_str[1] == 'X'))) ||
-				((type_address == 2) && (addr_str.size() == 40))
+				((type_address == ADDRESS_BITCOIN_LEGACY) && ((addr_str.size() == 33) || (addr_str.size() == 34)) && (addr_str[0] == '1')) ||
+				((type_address == ADDRESS_BITCOIN_NATIVE_SEGWIT) && (addr_str.size() == 42) && (addr_str[0] == 'b') && (addr_str[3] == 'q')) ||
+				((type_address == ADDRESS_BITCOIN_SEGWIT) && (addr_str.size() == 34) && (addr_str[0] == '3')) ||
+				((type_address == ADDRESS_ETHEREUM) && (addr_str.size() == 42) && (addr_str[0] == '0') && ((addr_str[1] == 'x')||(addr_str[1] == 'X'))) ||
+				((type_address == ADDRESS_ETHEREUM) && (addr_str.size() == 40))
 				)
 			{
 #ifdef	USE_REVERSE_32
 				uint8_t hash160[20];
-				if (type_address == 0)
+				if (type_address == ADDRESS_BITCOIN_LEGACY)
 					ret = decodeAddressBase58(addr_str, hash160);
-				else if (type_address == 1)
+				else if (type_address == ADDRESS_BITCOIN_SEGWIT)
+					ret = decodeAddressBIP49(addr_str, hash160);
+				else if (type_address == ADDRESS_BITCOIN_NATIVE_SEGWIT)
 					ret = decodeAddressBase32(addr_str, hash160);
-				else (type_address == 2)
+				else (type_address == ADDRESS_ETHEREUM)
+					XXXXX
 #else
-				if (type_address == 0)
+				if (type_address == ADDRESS_BITCOIN_LEGACY)
 				{
 					ret = decodeAddressBase58(addr_str, hash160hex);
+				}		
+				else if (type_address == ADDRESS_BITCOIN_SEGWIT)
+				{
+					ret = decodeAddressBIP49(addr_str, hash160hex);
 				}
-				else if (type_address == 1)
+				else if (type_address == ADDRESS_BITCOIN_NATIVE_SEGWIT)
 				{
 					ret = decodeAddressBase32(addr_str, hash160hex);
 				}
-				else if (type_address == 2)
+				else if (type_address == ADDRESS_ETHEREUM)
 				{
 					if (addr_str.size() == 42) hash160hex = addr_str.substr(2, 42);
 					else hash160hex = addr_str;
@@ -266,6 +274,7 @@ namespace tools {
 		int ret = 0;
 		std::string filename = "";
 		std::cout << "file path: " << config.folder_with_files_for_decode << std::endl;
+
 		std::cout << "Please, enter file name: ";
 		//std::cin >> filename;
 		//std::cin.clear();
@@ -273,26 +282,33 @@ namespace tools {
 		int type_address = -1;
 		while (type_address == -1)
 		{
-			std::cout << "[0] - Bitcoin Legacy, [1] - Bitcoin Native SegWit (Bech32), [2] - Ethereum" << std::endl;
+			std::cout << 
+				"[" << ADDRESS_BITCOIN_LEGACY << "] - Bitcoin Legacy (1\"address\")(BIP32, BIP44),\n" <<
+				"[" << ADDRESS_BITCOIN_SEGWIT << "] - Bitcoin SegWit (3\"address\")(BIP49),\n" <<
+				"[" << ADDRESS_BITCOIN_NATIVE_SEGWIT << "] - Bitcoin Native SegWit (bc1q\"address\")(BIP84),\n" <<
+				"[" << ADDRESS_ETHEREUM << "] - Ethereum (0x\"address\" or \"address\")" << std::endl;
 			std::cout << "Please, enter addresses type: ";
 			std::cin >> type_address;
-			if (type_address != 0 && type_address != 1 && type_address != 2)
+			if (type_address != ADDRESS_BITCOIN_LEGACY && type_address != ADDRESS_BITCOIN_NATIVE_SEGWIT && type_address != ADDRESS_BITCOIN_SEGWIT && type_address != ADDRESS_ETHEREUM)
 			{
 				type_address = -1;
-				std::cout << "Invalid addresses type! Please type 0..2" << std::endl;
+				std::cout << "Invalid addresses type! Please type 0..3" << std::endl;
 			}
 			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		}
 
+
 		std::string filepath = config.folder_with_files_for_decode + "\\" + filename;
 		std::string folger_for_result;
-		if (type_address == 0) folger_for_result = config.folder_for_database_legacy + "\\";
-		else if (type_address == 1) folger_for_result = config.folder_for_database_segwit + "\\";
-		else if (type_address == 2) folger_for_result = config.folder_for_database_ethereum + "\\";
+		if (type_address == ADDRESS_BITCOIN_LEGACY) folger_for_result = config.folder_for_tables_legacy + "\\";
+		else if (type_address == ADDRESS_BITCOIN_SEGWIT) folger_for_result = config.folder_for_tables_segwit + "\\";
+		else if (type_address == ADDRESS_BITCOIN_NATIVE_SEGWIT) folger_for_result = config.folder_for_tables_native_segwit + "\\";
+		else if (type_address == ADDRESS_ETHEREUM) folger_for_result = config.folder_for_tables_ethereum + "\\";
 		std::cout << "--------------------------------------------" << std::endl;
-		if (type_address == 0) std::cout << "decode bitcoin legacy addresses" << std::endl;
-		else if(type_address == 1) std::cout << "decode bitcoin native segwit addresses" << std::endl;
-		else if (type_address == 2) std::cout << "decode ethereum addresses" << std::endl;
+		if (type_address == ADDRESS_BITCOIN_LEGACY) std::cout << "Decode Bitcoin legacy addresses (1\"address\")(BIP32, BIP44)" << std::endl;
+		else if (type_address == ADDRESS_BITCOIN_SEGWIT) std::cout << "Decode Bitcoin segwit addresses (3\"address\")(BIP49)" << std::endl;
+		else if(type_address == ADDRESS_BITCOIN_NATIVE_SEGWIT) std::cout << "Decode Bitcoin native segwit addresses (bc1q\"address\")(BIP84)" << std::endl;
+		else if (type_address == ADDRESS_ETHEREUM) std::cout << "Decode Ethereum addresses (0x\"address\" or \"address\")" << std::endl;
 		std::cout << "file: " << filepath << std::endl;
 		std::cout << "folder for save result: " << folger_for_result << std::endl;
 		std::cout << "--------------------------------------------" << std::endl;

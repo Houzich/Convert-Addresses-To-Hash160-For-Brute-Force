@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
   * @author		Anton Houzich
-  * @version	V1.1.0
-  * @date		1-April-2023
+  * @version	V1.2.0
+  * @date		16-April-2023
   * @mail		houzich_anton@mail.ru
   * discussion  https://t.me/BRUTE_FORCE_CRYPTO_WALLET
   ******************************************************************************
@@ -200,7 +200,7 @@ namespace tools {
 	int decodeAddressBase58(const std::string& addr, std::string& hash160hex)
 	{
 		std::vector<unsigned char> hash160;
-		if (DecodeBase58Check(addr, hash160, 33)) {
+		if (DecodeBase58Check(addr, hash160, addr.size())) {
 			if (hash160.size() != 21) {
 				std::cerr << "ERROR HASH160. ADDRESS: \"" << addr << "\", HASH160 SIZE: " << hash160.size() << std::endl;
 				return -1;
@@ -226,7 +226,7 @@ namespace tools {
 	{
 		std::vector<unsigned char> v_hash160;
 
-		if (DecodeBase58Check(addr, v_hash160, 33)) {
+		if (DecodeBase58Check(addr, v_hash160, addr.size())) {
 			if (v_hash160.size() != 21) {
 				std::cerr << "ERROR HASH160. ADDRESS: \"" << addr << "\", HASH160 SIZE: " << v_hash160.size() << std::endl;
 				return -1;
@@ -244,6 +244,9 @@ namespace tools {
 
 		return 0;
 	}
+
+
+
 	int encodeAddressBase32(const std::string& hash160hex, std::string& addr)
 	{
 		std::vector<unsigned char> datastr = hexStringToVector(hash160hex);
@@ -257,7 +260,7 @@ namespace tools {
 
 		for (int i = 0; i < 20; i++) hash[i] = datastr[i];
 
-		segwit_addr_encode(address, "bc", 0, (const uint8_t*)hash, 20);
+		native_segwit_addr_encode(address, "bc", 0, (const uint8_t*)hash, 20);
 		addr = std::string(address);
 
 		return 0;
@@ -266,7 +269,7 @@ namespace tools {
 	int encodeAddressBase32(const uint8_t* hash160, std::string& addr)
 	{
 		char address[42 + 1];
-		segwit_addr_encode(address, "bc", 0, (const uint8_t*)hash160, 20);
+		native_segwit_addr_encode(address, "bc", 0, (const uint8_t*)hash160, 20);
 		addr = std::string(address);
 		return 0;
 	}
@@ -278,7 +281,7 @@ namespace tools {
 		uint8_t hash160[20];
 		size_t hash160_len = sizeof(hash160);
 
-		if (segwit_addr_decode(&witver, hash160, &hash160_len, "bc", addr.c_str()) == 1) {
+		if (native_segwit_addr_decode(&witver, hash160, &hash160_len, "bc", addr.c_str()) == 1) {
 
 			hash160hex = bytesToHexString(hash160, 20);
 		}
@@ -297,7 +300,7 @@ namespace tools {
 		uint8_t hash160[20];
 		size_t hash160_len = sizeof(hash160);
 
-		if (segwit_addr_decode(&witver, hash160, &hash160_len, "bc", addr.c_str()) == 1) {
+		if (native_segwit_addr_decode(&witver, hash160, &hash160_len, "bc", addr.c_str()) == 1) {
 
 			for (int i = 0; i < 20; i++) {
 				*(bytes++) = hash160[i];
@@ -312,6 +315,61 @@ namespace tools {
 
 		return 0;
 	}
+
+	int encodeAddressBIP49(const uint8_t* hash160, std::string& addr)
+	{
+		std::vector<unsigned char> v_hash160temp = { 0x05 };
+		v_hash160temp.insert(v_hash160temp.end(), hash160, hash160 + 20);
+		addr = EncodeBase58Check(v_hash160temp);
+		return 0;
+	}
+
+	int decodeAddressBIP49(const std::string& addr, std::string& hash160hex)
+	{
+		std::vector<unsigned char> hash160;
+		if (DecodeBase58Check(addr, hash160, addr.size())) {
+			if (hash160.size() != 21) {
+				std::cerr << "ERROR HASH160. ADDRESS: \"" << addr << "\", HASH160 SIZE: " << hash160.size() << std::endl;
+				return -1;
+			}
+			hash160hex = vectorToHexString(hash160);
+			if (hash160hex.length() != 42) {
+				std::cerr << "ERROR HASH160HEX: \"" << hash160hex << "\", HASH160HEX LENGHT: " << hash160hex.length() << std::endl;
+				return -1;
+			}
+			hash160hex.erase(hash160hex.begin(), hash160hex.begin() + 2);
+
+		}
+		else
+		{
+			std::cerr << "ERROR decodeAddressBase58. BIP49 ADDRESS: \"" << addr << "\", LEGHT: " << addr.size() << std::endl;
+			return -1;
+		}
+
+		return 0;
+	}
+	int decodeAddressBIP49(const std::string& addr, uint8_t* hash160)
+	{
+		std::vector<unsigned char> h160;
+		if (DecodeBase58Check(addr, h160, addr.size())) {
+			if (h160.size() != 21) {
+				std::cerr << "ERROR HASH160. ADDRESS: \"" << addr << "\", HASH160 SIZE: " << h160.size() << std::endl;
+				return -1;
+			}
+			for (int i = 1; i < (20 + 1); i++) {
+				*(hash160++) = h160[i];
+			}
+		}
+		else
+		{
+			std::cerr << "ERROR DecodeBase58Check. BIP49 ADDRESS: \"" << addr << "\", LEGHT: " << addr.size() << std::endl;
+			return -1;
+		}
+
+		return 0;
+	}
+
+
 
 	void reverseHashUint32(uint32_t* hash_in, uint32_t* hash_out) {
 		uint32_t hash160_reverse[5] = { 0 };
