@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
   * @author		Anton Houzich
-  * @version	V1.2.0
-  * @date		16-April-2023
+  * @version	V2.0.0
+  * @date		29-April-2023
   * @mail		houzich_anton@mail.ru
   * discussion  https://t.me/BRUTE_FORCE_CRYPTO_WALLET
   ******************************************************************************
@@ -139,6 +139,43 @@ namespace tools {
 		return 0;
 	}
 
+	std::string uint32ToHexString(uint32_t data)
+	{
+		std::stringstream ss;
+		ss << std::hex << std::uppercase;
+		ss << std::setw(8) << std::setfill('0') << data;
+		const std::string hexstr = ss.str();
+
+		return hexstr;
+	}
+	std::string hash160Uint32ToHexString(std::array<uint32_t, 5>& hash160)
+	{
+		std::string hexstr = "";
+		for (int i = 0; i < 5; i++) {
+			hexstr.append(uint32ToHexString(hash160[i]));
+		}
+		return hexstr;
+	}
+
+	int hexStringHash160ToArrayUint32(const std::string& source, std::array<uint32_t, 5>& hash160)
+	{
+		if (std::string::npos != source.find_first_not_of("0123456789ABCDEFabcdef"))
+		{
+			return -1;
+		}
+		if (source.size() != 40)
+		{
+			return -1;
+		}
+
+		hash160[0] = std::stoul(source.substr(0, 8), nullptr, 16);
+		hash160[1] = std::stoul(source.substr(8, 8), nullptr, 16);
+		hash160[2] = std::stoul(source.substr(16, 8), nullptr, 16);
+		hash160[3] = std::stoul(source.substr(24, 8), nullptr, 16);
+		hash160[4] = std::stoul(source.substr(32, 8), nullptr, 16);
+
+		return 0;
+	}
 
 	std::string vectorToHexString(std::vector<uint8_t>& data)
 	{
@@ -384,5 +421,17 @@ namespace tools {
 		hash_out[3] = hash160_reverse[3];
 		hash_out[4] = hash160_reverse[4];
 	}
-
+	void reverseHashArrayUint32(std::array<uint32_t, 5>& hash_in, std::array<uint32_t, 5>& hash_out) {
+		uint32_t hash160_reverse[5] = { 0 };
+		REVERSE32_FOR_HASH(hash_in[0], hash160_reverse[0]);
+		REVERSE32_FOR_HASH(hash_in[1], hash160_reverse[1]);
+		REVERSE32_FOR_HASH(hash_in[2], hash160_reverse[2]);
+		REVERSE32_FOR_HASH(hash_in[3], hash160_reverse[3]);
+		REVERSE32_FOR_HASH(hash_in[4], hash160_reverse[4]);
+		hash_out[0] = hash160_reverse[0];
+		hash_out[1] = hash160_reverse[1];
+		hash_out[2] = hash160_reverse[2];
+		hash_out[3] = hash160_reverse[3];
+		hash_out[4] = hash160_reverse[4];
+	}
 }

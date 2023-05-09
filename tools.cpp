@@ -1,8 +1,8 @@
 ﻿/**
   ******************************************************************************
   * @author		Anton Houzich
-  * @version	V1.2.0
-  * @date		16-April-2023
+  * @version	V2.0.0
+  * @date		29-April-2023
   * @mail		houzich_anton@mail.ru
   * discussion  https://t.me/BRUTE_FORCE_CRYPTO_WALLET
   ******************************************************************************
@@ -82,17 +82,7 @@ namespace tools {
 				((type_address == ADDRESS_ETHEREUM) && (addr_str.size() == 40))
 				)
 			{
-#ifdef	USE_REVERSE_32
-				uint8_t hash160[20];
-				if (type_address == ADDRESS_BITCOIN_LEGACY)
-					ret = decodeAddressBase58(addr_str, hash160);
-				else if (type_address == ADDRESS_BITCOIN_SEGWIT)
-					ret = decodeAddressBIP49(addr_str, hash160);
-				else if (type_address == ADDRESS_BITCOIN_NATIVE_SEGWIT)
-					ret = decodeAddressBase32(addr_str, hash160);
-				else (type_address == ADDRESS_ETHEREUM)
-					XXXXX
-#else
+
 				if (type_address == ADDRESS_BITCOIN_LEGACY)
 				{
 					ret = decodeAddressBase58(addr_str, hash160hex);
@@ -110,7 +100,7 @@ namespace tools {
 					if (addr_str.size() == 42) hash160hex = addr_str.substr(2, 42);
 					else hash160hex = addr_str;
 				}
-#endif //USE_REVERSE
+
 
 				if (ret) {
 #pragma omp critical
@@ -120,10 +110,7 @@ namespace tools {
 					ret = -1;
 					break;
 				}
-#ifdef	USE_REVERSE_32
-				reverseHashUint32((uint32_t *)hash160, (uint32_t*)hash160);
-				hash160hex = bytesToHexString(hash160, 20);
-#endif //USE_REVERSE
+
 
 				std::string name_table = hash160hex.substr(0, 2);
 				uint8_t num_table = std::stoi(name_table, nullptr, 16);
@@ -197,7 +184,7 @@ namespace tools {
 				close_files(of);
 				return ret;
 			}
-
+		input_file.close();
 		close_files(of);
 		std::cout << "\rDECODE ADDRESSES: "<< count_line  <<" | FAILED LINES: " << count_fail_lines << std::endl;
 		return 0;
@@ -219,21 +206,44 @@ namespace tools {
 				inFile.open(file_path, std::ifstream::in);
 				if (inFile.is_open())
 				{
-					std::vector<std::string> lines;
+					std::vector<std::array<uint32_t, 5>> hashes;
 					std::string line;
 					while (getline(inFile, line)) {
-						lines.push_back(line);
+						std::array<uint32_t, 5> hash160{ 0,0,0,0,0 };
+						if (hexStringHash160ToArrayUint32(line, hash160) == 0)
+						{
+							reverseHashArrayUint32(hash160, hash160);
+							hashes.push_back(hash160);
+						}
 					}
-					std::sort(lines.begin(), lines.end());
-					auto last = std::unique(lines.begin(), lines.end());
-					lines.erase(last, lines.end());
+					struct
+					{
+						bool operator()(std::array<uint32_t, 5> a, std::array<uint32_t, 5> b) const {
+							if (a[0] < b[0]) return true;
+							else if (a[0] > b[0]) return false;
+							if (a[1] < b[1]) return true;
+							else if (a[1] > b[1]) return false;
+							if (a[2] < b[2]) return true;
+							else if (a[2] > b[2]) return false;
+							if (a[3] < b[3]) return true;
+							else if (a[3] > b[3]) return false;
+							if (a[4] < b[4]) return true;
+							else if (a[4] > b[4]) return false;
+							return false;
+						}
+					}customLess;
+					std::sort(hashes.begin(), hashes.end(), customLess);
+					auto last = std::unique(hashes.begin(), hashes.end());
+					hashes.erase(last, hashes.end());
 
 					inFile.close();
 					outFile.open(file_path);
 					if (outFile.is_open())
 					{
-						for (int ii = 0; ii < lines.size(); ii++)
-							outFile << lines[ii] << std::endl;
+						for (int ii = 0; ii < hashes.size(); ii++) {
+							reverseHashArrayUint32(hashes[ii], hashes[ii]);
+							outFile << hash160Uint32ToHexString(hashes[ii]) << std::endl;
+						}
 					}
 					else
 					{
@@ -243,7 +253,7 @@ namespace tools {
 					}
 
 					outFile.close();
-					count_addrs += lines.size();
+					count_addrs += hashes.size();
 
 				}
 				else
@@ -267,6 +277,7 @@ namespace tools {
 		std::cout << "!!!SORT LINES: " << all_count_in_all_files << std::endl;
 		return ret;
 	}
+
 
 
 	int DecodeFile(ConfigClass config) {
