@@ -39,7 +39,7 @@
 
 ## Файл CreateBruteForceDatabaseV200.exe находится в папке exe
 
-### ОБСУЖДЕНИЕ КОДА: https://t.me/BRUTE_FORCE_CRYPTO_WALLET
+### ОБСУЖДЕНИЕ КОДА: https://t.me/brute_force_gpu
 
 ## If you want to support the project don't hesitate to donate.
 **BTC** - bc1qqldn5lyk54rcvf5ndruh525v0qz8lf9yu5t9a5</br>
