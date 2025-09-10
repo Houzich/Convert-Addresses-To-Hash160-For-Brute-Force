@@ -4,7 +4,7 @@
   * @version	V2.0.0
   * @date		29-April-2023
   * @mail		houzich_anton@mail.ru
-  * discussion  https://t.me/BRUTE_FORCE_CRYPTO_WALLET
+  * discussion  https://t.me/brute_force_gpu
   ******************************************************************************
   */
 #include "stdafx.h"
@@ -46,3 +46,4 @@ int main()
     std::this_thread::sleep_for(std::chrono::seconds(100));
     return 0;
 }
+

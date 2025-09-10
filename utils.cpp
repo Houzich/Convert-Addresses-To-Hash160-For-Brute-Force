@@ -4,7 +4,7 @@
   * @version	V2.0.0
   * @date		29-April-2023
   * @mail		houzich_anton@mail.ru
-  * discussion  https://t.me/BRUTE_FORCE_CRYPTO_WALLET
+  * discussion  https://t.me/brute_force_gpu
   ******************************************************************************
   */
 #include "stdafx.h"
@@ -435,3 +435,4 @@ namespace tools {
 		hash_out[4] = hash160_reverse[4];
 	}
 }
+
