@@ -15,3 +15,4 @@
 namespace tools {
 	int DecodeFile(ConfigClass config);
 }
+

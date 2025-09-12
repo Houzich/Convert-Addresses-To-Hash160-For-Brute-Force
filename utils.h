@@ -37,3 +37,4 @@ namespace tools {
 	void reverseHashUint32(uint32_t* hash_in, uint32_t* hash_out);
 	void reverseHashArrayUint32(std::array<uint32_t, 5>& hash_in, std::array<uint32_t, 5>& hash_out);
 }
+

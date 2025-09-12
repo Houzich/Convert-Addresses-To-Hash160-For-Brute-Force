@@ -35,3 +35,4 @@
 	(x) = ((tmp & 0xffff0000ffff0000UL) >> 16) | \
 	      ((tmp & 0x0000ffff0000ffffUL) << 16); \
 }
+
